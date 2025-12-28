@@ -1,6 +1,5 @@
 # ======================================================
-# Impress.AI — Final App (Tab-based)
-# Tab 3: CV Model + ECDF Relative Performance
+# Impress.AI — App
 # ======================================================
 
 import streamlit as st
@@ -11,6 +10,8 @@ import torch.nn as nn
 from torchvision import models, transforms
 from PIL import Image
 import pickle
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # ======================================================
 # Page Config
@@ -107,6 +108,48 @@ transform = transforms.Compose([
         std=[0.229, 0.224, 0.225]
     )
 ])
+# ======================================================
+# Constants
+# ======================================================
+TYPE_DESC = {
+    1: "여러 제품을 함께 보여주는 제품 단체샷",
+    2: "한 제품을 단독으로 강조한 제품 단독샷",
+    3: "제품 제형/텍스처를 중심으로 한 제품 질감샷",
+    4: "모델과 제품을 함께 배치한 이미지",
+    5: "제품 없이 모델 중심으로 연출된 이미지",
+    6: "여러 인물과 제품을 함께 보여주는 이미지"
+}
+
+def performance_level(ecdf):
+    if ecdf >= 80:
+        return "높음", "badge-high"
+    elif ecdf >= 50:
+        return "보통", "badge-mid"
+    else:
+        return "낮음", "badge-low"
+    
+# ======================================================
+# Badge Style
+# ======================================================
+st.markdown("""
+<style>
+.badge-high {
+    background:#dcfce7; color:#166534;
+    padding:8px 18px; border-radius:999px;
+    font-weight:700;
+}
+.badge-mid {
+    background:#fef9c3; color:#854d0e;
+    padding:8px 18px; border-radius:999px;
+    font-weight:700;
+}
+.badge-low {
+    background:#fee2e2; color:#991b1b;
+    padding:8px 18px; border-radius:999px;
+    font-weight:700;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ======================================================
 # Utility Functions
@@ -147,7 +190,7 @@ tab1, tab2, tab3 = st.tabs([
 with tab1:
     st.subheader("📊 이미지 유형 활용도")
 
-    usage = df_view.groupby("img_type").size().reset_index(name="count")
+    usage = df_ref.groupby("img_type").size().reset_index(name="count")
 
     col1, col2 = st.columns([1, 2])
     with col1:
@@ -168,13 +211,13 @@ with tab2:
 
     with col1:
         fig, ax = plt.subplots()
-        sns.boxplot(data=df_view, x="img_type", y="eng_rate", ax=ax)
+        sns.boxplot(data=df_ref, x="img_type", y="eng_rate", ax=ax)
         ax.set_yscale("log")
         st.pyplot(fig)
 
     with col2:
         fig, ax = plt.subplots()
-        sns.boxplot(data=df_view, x="img_type", y="eng_rank_country_type", ax=ax)
+        sns.boxplot(data=df_ref, x="img_type", y="eng_rank_country_type", ax=ax)
         st.pyplot(fig)
 
 
@@ -217,31 +260,54 @@ with tab3:
         ecdf = get_ecdf_percentile(
             df_ref, country, img_type, pred_logeng
         )
+        if ecdf is None:
+            percent = 50.0
+        else:
+            percent = ecdf
 
+        level, badge_class = performance_level(percent)
         with right:
-            st.markdown("### 🔮 예측 결과")
+            st.markdown(f"""
+<div style="
+background:#ffffff;
+padding:28px;
+border-radius:20px;
+border:1px solid #e5e7eb;
+box-shadow:0 12px 30px rgba(0,0,0,0.08);
+">
 
-            st.write(f"**예측 이미지 유형:** Type {img_type}")
-            st.write(f"**예측 log-eng score:** {pred_logeng:.4f}")
+<h2>예측 결과</h2>
 
-            if ecdf is None:
-                st.warning("기준 데이터가 부족하여 상대 성과를 계산할 수 없습니다.")
-            else:
-                st.metric(
-                    label="상대 성과 위치 (ECDF)",
-                    value=f"{ecdf:.1f}%",
-                    help="동일 국가·유형 콘텐츠 중 해당 이미지보다 성과가 낮은 비율"
-                )
+<h3>이미지 유형 · Type {img_type}</h3>
 
-                st.write(
-                    f"👉 동일 국가·유형 콘텐츠 중 "
-                    f"**약 {ecdf:.1f}%보다 높은 성과**가 예측됩니다."
-                )
+<span class="{badge_class}">{level}</span>
 
-                st.markdown(f"### {top10_badge(ecdf)}")
+<p style="margin-top:10px; color:#6b7280;">
+동일 국가·유형 콘텐츠 대비 상대적 성과 수준
+</p>
 
-                st.caption(
-                    "※ 본 지표는 경험적 분포(ECDF)를 기반으로 한 상대 성과 평가입니다."
-                )
+<h1 style="margin-top:20px;">{percent:.1f}%</h1>
+
+<hr>
+
+<h4>🧠 AI 해석</h4>
+
+<p>
+<b>{country} 시장 기준</b>, 이 이미지는<br>
+<b>{TYPE_DESC[img_type]}</b> 유형으로 분류되었습니다.
+</p>
+
+<p>
+과거 유사 콘텐츠의 반응 패턴을 고려할 때,<br>
+이 유형은 <b>{level}</b> 수준의 성과 경향을 보일 가능성이 있습니다.
+</p>
+
+<p style="font-size:12px; color:#6b7280;">
+※ 절대적인 수치 예측이 아닌, 상대적 위치 기반 지표입니다.
+</p>
+
+</div>
+""", unsafe_allow_html=True)
+
     else:
         st.info("⬅️ 이미지를 업로드하면 예측 결과가 표시됩니다.")
