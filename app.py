@@ -36,6 +36,91 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+st.markdown("""
+<style>
+/* Card */
+.result-card{
+  background:#ffffff;
+  padding:28px;
+  border-radius:20px;
+  border:1px solid #e5e7eb;
+  box-shadow:0 12px 30px rgba(0,0,0,0.08);
+}
+.result-title{
+  font-size:32px;
+  font-weight:800;
+  margin:0 0 10px 0;
+}
+.result-subtitle{
+  font-size:20px;
+  font-weight:700;
+  margin:0 0 6px 0;
+}
+.meta{
+  color:#6b7280;
+  font-size:13px;
+  margin-top:8px;
+}
+.big{
+  font-size:54px;
+  font-weight:900;
+  margin:10px 0 6px 0;
+  letter-spacing:-0.5px;
+}
+.divider{
+  height:1px;
+  background:#e5e7eb;
+  margin:18px 0;
+}
+.section-title{
+  font-size:18px;
+  font-weight:800;
+  margin:0 0 8px 0;
+}
+.ai-box{
+  background:#f9fafb;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  padding:16px;
+}
+.ai-box p{
+  margin:10px 0;
+  line-height:1.6;
+}
+.kicker{
+  color:#111827;
+  font-weight:800;
+}
+.note{
+  color:#6b7280;
+  font-size:12px;
+  margin-top:10px;
+}
+
+/* Badges */
+.badge{
+  display:inline-block;
+  padding:8px 16px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:14px;
+}
+.badge-high{ background:#dcfce7; color:#166534; }
+.badge-mid{  background:#fef9c3; color:#854d0e; }
+.badge-low{  background:#fee2e2; color:#991b1b; }
+
+/* Type pill */
+.type-pill{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid #e5e7eb;
+  background:#f9fafb;
+  font-weight:800;
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 # ======================================================
 # Load Reference Data
@@ -120,13 +205,14 @@ TYPE_DESC = {
     6: "여러 인물과 제품을 함께 보여주는 이미지"
 }
 
-def performance_level(ecdf):
-    if ecdf >= 80:
-        return "높음", "badge-high"
-    elif ecdf >= 50:
-        return "보통", "badge-mid"
+def performance_level(ecdf_percent: float):
+    if ecdf_percent >= 80:
+        return "높음", "badge badge-high"
+    elif ecdf_percent >= 50:
+        return "보통", "badge badge-mid"
     else:
-        return "낮음", "badge-low"
+        return "낮음", "badge badge-low"
+
     
 # ======================================================
 # Badge Style
@@ -154,16 +240,13 @@ st.markdown("""
 # ======================================================
 # Utility Functions
 # ======================================================
-def get_ecdf_percentile(df, country, img_type, pred_logeng):
-    ref = df[
-        (df["country"] == country) &
-        (df["img_type"] == img_type)
-    ]["log_eng"].values
+def get_country_ecdf_percentile(df_ref, country, pred_logeng):
+    ref = df_ref[df_ref["country"] == country]["log_eng"].dropna().values
 
-    if len(ref) < 5:
+    if len(ref) == 0:
         return None
 
-    return (ref < pred_logeng).mean() * 100
+    return float((ref < pred_logeng).mean() * 100.0)
 
 
 def top10_badge(ecdf):
@@ -235,79 +318,100 @@ with tab3:
             type=["jpg", "png", "jpeg"]
         )
         country = st.selectbox("국가 선택", country_list)
-
+    
         if uploaded:
             image = Image.open(uploaded).convert("RGB")
             st.image(image)
+            img_tensor = transform(image).unsqueeze(0)
 
-    if uploaded:
-        img_tensor = transform(image).unsqueeze(0)
+            country_vec = country_encoder.transform(
+                pd.DataFrame([[country]], columns=["country"])
+            )
+            country_vec = torch.tensor(country_vec, dtype=torch.float32)
 
-        country_vec = country_encoder.transform(
-            pd.DataFrame([[country]], columns=["country"])
-        )
-        country_vec = torch.tensor(country_vec, dtype=torch.float32)
+            with torch.no_grad():
+                cls_out, reg_out = model(img_tensor, country_vec)
 
-        with torch.no_grad():
-            cls_out, reg_out = model(img_tensor, country_vec)
+            cls_idx = int(torch.argmax(cls_out, dim=1).item())
+            img_type = cls_idx + 1
 
-        cls_idx = int(torch.argmax(cls_out, dim=1).item())
-        img_type = cls_idx + 1
+    
+            pred_z = float(reg_out.item())
+            pred_logeng = pred_z * sigma + mu
 
-        pred_z = float(reg_out.item())
-        pred_logeng = pred_z * sigma + mu
+        
+            ecdf = get_country_ecdf_percentile(df_ref, country, pred_logeng)
 
-        ecdf = get_ecdf_percentile(
-            df_ref, country, img_type, pred_logeng
-        )
-        if ecdf is None:
-            percent = 50.0
+            if ecdf is None or (isinstance(ecdf, float) and np.isnan(ecdf)):
+                percent = 50.0
+            else:
+                percent = float(ecdf)
+
+            
+            type_name = TYPE_DESC.get(img_type, f"Type {img_type}")
+
+            # 성과 수준(뱃지)
+            level, badge_class = performance_level(percent)
+
+            with right:
+                st.markdown(f"""
+                <div style="
+                    background:#ffffff;
+                    padding:28px;
+                    border-radius:20px;
+                    border:1px solid #e5e7eb;
+                    box-shadow:0 10px 24px rgba(0,0,0,0.06);
+                ">
+
+                <h2 style="margin-bottom:6px;">🔮 예측 결과</h2>
+
+                <p style="margin:0; color:#6b7280; font-size:13px;">
+                    {country} 시장 내 콘텐츠 대비 예상 성과 위치
+                </p>
+
+                <h3 style="margin-top:8px; margin-bottom:6px;">
+                    {percent:.1f}%
+                </h3>
+
+                <span class="{badge_class}" style="
+                    display:inline-block;
+                    padding:8px 18px;
+                    border-radius:999px;
+                    font-size:16px;
+                    font-weight:700;
+                    margin-top:4px;
+                ">
+                    {level}
+                </span>
+
+                <hr style="margin:22px 0;">
+
+                <h4 style="margin-bottom:6px;">📌 이미지 유형</h4>
+                <p style="margin-top:0;">
+                    <b>Type {img_type}</b> · {type_name}
+                </p>
+
+                <h4 style="margin-bottom:8px;">🧠 AI 해석</h4>
+
+                <p>
+                    <b>{country} 시장 기준</b>으로 볼 때,
+                    이 이미지는 <b>{type_name}</b> (Type {img_type}) 유형으로 분류되었습니다.
+                </p>
+
+                <p>
+                    CV 모델이 예측한 반응 강도를
+                    <b>{country} 시장 전체 콘텐츠 분포</b>와 비교한 결과,
+                    <b>{level}</b> 수준의 상대적 성과 위치에 해당합니다.
+                </p>
+
+                <p style="color:#6b7280; font-size:13px;">
+                    ※ 본 지표는 절대적인 성과 수치를 예측하기보다는,
+                    동일 국가 내 콘텐츠 간 상대적 위치를 참고하기 위한 지표입니다.
+                </p>
+
+                </div>
+                """, unsafe_allow_html=True)
+
         else:
-            percent = ecdf
-
-        level, badge_class = performance_level(percent)
-        with right:
-            st.markdown(f"""
-<div style="
-background:#ffffff;
-padding:28px;
-border-radius:20px;
-border:1px solid #e5e7eb;
-box-shadow:0 12px 30px rgba(0,0,0,0.08);
-">
-
-<h2>예측 결과</h2>
-
-<h3>이미지 유형 · Type {img_type}</h3>
-
-<span class="{badge_class}">{level}</span>
-
-<p style="margin-top:10px; color:#6b7280;">
-동일 국가·유형 콘텐츠 대비 상대적 성과 수준
-</p>
-
-<h1 style="margin-top:20px;">{percent:.1f}%</h1>
-
-<hr>
-
-<h4>🧠 AI 해석</h4>
-
-<p>
-<b>{country} 시장 기준</b>, 이 이미지는<br>
-<b>{TYPE_DESC[img_type]}</b> 유형으로 분류되었습니다.
-</p>
-
-<p>
-과거 유사 콘텐츠의 반응 패턴을 고려할 때,<br>
-이 유형은 <b>{level}</b> 수준의 성과 경향을 보일 가능성이 있습니다.
-</p>
-
-<p style="font-size:12px; color:#6b7280;">
-※ 절대적인 수치 예측이 아닌, 상대적 위치 기반 지표입니다.
-</p>
-
-</div>
-""", unsafe_allow_html=True)
-
-    else:
-        st.info("⬅️ 이미지를 업로드하면 예측 결과가 표시됩니다.")
+            with right:
+                st.info("⬅️ 이미지를 업로드하면 예측 결과가 표시됩니다.")
