@@ -37,6 +37,7 @@ countries = get_countries(df_meta)
 # ======================================================
 st.sidebar.header("🔧 Filters")
 selected_country = st.sidebar.selectbox("Select Country", countries)
+st.session_state.selected_country = selected_country
 st.sidebar.caption(
     f"📊 Records: {len(df_meta[df_meta['country']==selected_country])}"
 )
