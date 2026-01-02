@@ -1,64 +1,74 @@
-# ======================================================
-# Impress.AI — 앱 엔트리 (라우팅 + 레이아웃만)
-# ======================================================
-
 import streamlit as st
 
-from components.layout import render_header
-from components.style import inject_style
+from components.style import apply_custom_style
 from utils.data_loader import load_reference_df, load_meta_df, get_countries
 from tabs.tab1_usage import render as render_tab1
 from tabs.tab2_performance import render as render_tab2
 from tabs.tab3_predict import render as render_tab3
 
-# ======================================================
-# Page Config
-# ======================================================
 st.set_page_config(
-    page_title="Impress.AI",
+    page_title="AP.SIGNAL",
     page_icon="📸",
     layout="wide"
 )
 
-# ======================================================
-# Header
-# ======================================================
-render_header()
+apply_custom_style()
 
-# ======================================================
-# Load Data
-# ======================================================
 df_ref = load_reference_df()
 df_meta = load_meta_df()
 countries = get_countries(df_meta)
 
-# ======================================================
-# Sidebar
-# ======================================================
-st.sidebar.header("🔧 Filters")
-selected_country = st.sidebar.selectbox("Select Country", countries)
-st.session_state.selected_country = selected_country
-st.sidebar.caption(
-    f"📊 Records: {len(df_meta[df_meta['country']==selected_country])}"
-)
+with st.sidebar:
+    st.markdown(
+        """
+        <div class="sidebar-title" style="padding: 20px 0 20px 12px;">
+            <div class="sidebar-title-text" style="font-family: 'Arita-Dotum-Bold', 'Arita-dotum-Medium', 'Arita-Dotum-Medium', sans-serif !important; font-size: 28px; font-weight: 700; color: #FFFFFF;">
+                AP.SIGNAL
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    # 구분선 추가
+    st.markdown(
+        """
+        <div style="
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 0 16px 24px 16px;
+        "></div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    nav_options = ["활용도 모니터링", "성과 분석", "AI 예측"]
+    
+    if "nav_selected" not in st.session_state:
+        st.session_state.nav_selected = 0
+    
+    selected_idx = st.radio(
+        "Navigation",
+        nav_options,
+        index=st.session_state.nav_selected,
+        label_visibility="collapsed",
+        key="sidebar_nav"
+    )
+    st.session_state.nav_selected = nav_options.index(selected_idx)
+    
+    nav_map = {
+        "활용도 모니터링": "Usage Monitor",
+        "성과 분석": "Performance",
+        "AI 예측": "AI Prediction"
+    }
+    selected = nav_map[selected_idx]
 
-# ======================================================
-# Tabs
-# ======================================================
-tab1, tab2, tab3 = st.tabs([
-    "📊 콘텐츠 활용 모니터링",
-    "🔥 콘텐츠 성과 분석 & 패턴 도출",
-    "🤖 AI 콘텐츠 성과 예측"
-])
+if "selected_country" not in st.session_state:
+    st.session_state.selected_country = countries[0]
 
-# ======================================================
-# Tab Rendering
-# ======================================================
-with tab1:
+if selected == "Usage Monitor":
     render_tab1()
-
-with tab2:
+elif selected == "Performance":
     render_tab2()
-
-with tab3:
+elif selected == "AI Prediction":
     render_tab3(df_ref)

@@ -14,3 +14,4 @@ matplotlib==3.8.4
 scipy
 openpyxl
 plotly==5.18.0
+streamlit-option-menu==0.3.13
