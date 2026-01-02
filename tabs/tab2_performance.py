@@ -635,12 +635,21 @@ def render():
                     """,
                     unsafe_allow_html=True
                 )
-                colors = [CHART_PALETTE[0]] * len(stability)
+                # 최고값 막대는 연한 하늘색으로 강조
+                max_idx = stability["eng_std"].idxmax()
+                colors = []
+                for idx, row in stability.iterrows():
+                    if idx == max_idx:
+                        colors.append(LIGHT_BLUE_HIGHLIGHT)  # 최고값은 연한 하늘색
+                    else:
+                        colors.append(DEFAULT_BAR_COLOR)  # 나머지는 #E1E4EA
+                
                 fig1 = px.bar(
                     stability,
                     x="img_type",
                     y="eng_std",
-                    labels={"img_type": "이미지 타입", "eng_std": ""}
+                    labels={"img_type": "이미지 타입", "eng_std": ""},
+                    title=None
                 )
                 fig1.update_traces(marker_color=colors, width=0.6)
                 fig1 = apply_chart_style(fig1)
@@ -650,7 +659,8 @@ def render():
                     height=300,
                     yaxis=dict(title=None),
                     margin=dict(l=40, r=20, t=20, b=40),
-                    title=None
+                    title=dict(text=""),
+                    xaxis=dict(title=None)
                 )
                 st.plotly_chart(fig1, use_container_width=True, config={"displayModeBar": False})
             
@@ -664,12 +674,21 @@ def render():
                     """,
                     unsafe_allow_html=True
                 )
-                colors = [DEFAULT_BAR_COLOR] * len(stability)
+                # 최고값 막대는 연한 하늘색으로 강조
+                max_idx = stability["eng_iqr"].idxmax()
+                colors = []
+                for idx, row in stability.iterrows():
+                    if idx == max_idx:
+                        colors.append(LIGHT_BLUE_HIGHLIGHT)  # 최고값은 연한 하늘색
+                    else:
+                        colors.append(DEFAULT_BAR_COLOR)  # 나머지는 #E1E4EA
+                
                 fig2 = px.bar(
                     stability,
                     x="img_type",
                     y="eng_iqr",
-                    labels={"img_type": "이미지 타입", "eng_iqr": ""}
+                    labels={"img_type": "이미지 타입", "eng_iqr": ""},
+                    title=None
                 )
                 fig2.update_traces(marker_color=colors, width=0.6)
                 fig2 = apply_chart_style(fig2)
@@ -679,7 +698,8 @@ def render():
                     height=300,
                     yaxis=dict(title=None),
                     margin=dict(l=40, r=20, t=20, b=40),
-                    title=None
+                    title=dict(text=""),
+                    xaxis=dict(title=None)
                 )
                 st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
             
@@ -693,12 +713,21 @@ def render():
                     """,
                     unsafe_allow_html=True
                 )
-                colors = [DEFAULT_BAR_COLOR] * len(stability)
+                # 최고값 막대는 연한 하늘색으로 강조
+                max_idx = stability["eng_cv"].idxmax()
+                colors = []
+                for idx, row in stability.iterrows():
+                    if idx == max_idx:
+                        colors.append(LIGHT_BLUE_HIGHLIGHT)  # 최고값은 연한 하늘색
+                    else:
+                        colors.append(DEFAULT_BAR_COLOR)  # 나머지는 #E1E4EA
+                
                 fig3 = px.bar(
                     stability,
                     x="img_type",
                     y="eng_cv",
-                    labels={"img_type": "이미지 타입", "eng_cv": ""}
+                    labels={"img_type": "이미지 타입", "eng_cv": ""},
+                    title=None
                 )
                 fig3.update_traces(marker_color=colors, width=0.6)
                 fig3 = apply_chart_style(fig3)
@@ -708,7 +737,8 @@ def render():
                     height=300,
                     yaxis=dict(title=None),
                     margin=dict(l=40, r=20, t=20, b=40),
-                    title=None
+                    title=dict(text=""),
+                    xaxis=dict(title=None)
                 )
                 st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar": False})
         
