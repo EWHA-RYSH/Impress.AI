@@ -93,6 +93,16 @@ def inject_style():
             font-family: 'Arita-Sans-Medium', sans-serif !important;
         }}
         
+        /* KPI 카드 전용 폰트 - 클래스 기반 */
+        .kpi-card-wrapper,
+        .kpi-card-wrapper * {{
+            font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', 'Arita-Dotum-Medium', 'Malgun Gothic', sans-serif !important;
+        }}
+        
+        .kpi-value {{
+            font-family: 'Arita-Dotum-Bold', 'Arita-dotum-Bold', 'Arita-Dotum-Bold', 'Malgun Gothic', sans-serif !important;
+        }}
+        
         /* KPI 카드 전용 폰트 - 전역 스타일보다 우선순위 높게 */
         div[data-testid="stMarkdownContainer"] div[style*="background-color: #FFFFFF"][style*="border: 1px solid #E5E7EB"],
         div[data-testid="stMarkdownContainer"] div[style*="background-color: #FFFFFF"][style*="border: 1px solid #E5E7EB"] div,

@@ -261,67 +261,8 @@ def render():
         if "중앙값 참여율" in perf_display.columns:
             perf_display["중앙값 참여율"] = perf_display["중앙값 참여율"].apply(lambda x: format_engagement_rate(x))
         
-        # HTML 테이블로 렌더링 (중앙 정렬)
-        perf_rows = []
-        for idx, row in perf_display.iterrows():
-            bg_color = "#FFFFFF" if idx % 2 == 0 else "#FAFBFC"
-            border_top = "border-top: 1px solid #E5E7EB;" if idx == 0 else ""
-            
-            # 숫자 포맷팅
-            avg_likes = f"{row['평균 좋아요']:.1f}" if isinstance(row['평균 좋아요'], (int, float)) else str(row['평균 좋아요'])
-            med_likes = f"{row['중앙값 좋아요']:.1f}" if isinstance(row['중앙값 좋아요'], (int, float)) else str(row['중앙값 좋아요'])
-            avg_comments = f"{row['평균 댓글']:.1f}" if isinstance(row['평균 댓글'], (int, float)) else str(row['평균 댓글'])
-            med_comments = f"{row['중앙값 댓글']:.1f}" if isinstance(row['중앙값 댓글'], (int, float)) else str(row['중앙값 댓글'])
-            
-            perf_rows.append(f"""
-            <tr style="background-color: {bg_color};">
-                <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; font-weight: 500; color: #111827; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important; {border_top}">{row['이미지 타입']}</td>
-                <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; color: #374151; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important; {border_top}">{row['개수']}</td>
-                <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; color: #374151; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important; {border_top}">{avg_likes}</td>
-                <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; color: #374151; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important; {border_top}">{med_likes}</td>
-                <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; color: #374151; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important; {border_top}">{avg_comments}</td>
-                <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; color: #374151; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important; {border_top}">{med_comments}</td>
-                <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; color: #1F5795; font-weight: 500; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important; {border_top}">{row['평균 참여율']}</td>
-                <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; color: #1F5795; font-weight: 500; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important; {border_top}">{row['중앙값 참여율']}</td>
-            </tr>
-            """)
-        
-        perf_table_html = f"""
-        <div style="
-            background-color: #FFFFFF;
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            margin-bottom: 24px;
-        ">
-            <table style="
-                width: 100%;
-                border-collapse: collapse;
-                margin: 0;
-                font-size: 13px;
-                font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;
-            ">
-                <thead>
-                    <tr style="background: linear-gradient(to bottom, #F9FAFB 0%, #F3F4F6 100%);">
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">이미지 타입</th>
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">개수</th>
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">평균 좋아요</th>
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">중앙값 좋아요</th>
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">평균 댓글</th>
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">중앙값 댓글</th>
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">평균 참여율</th>
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">중앙값 참여율</th>
-                    </tr>
-                </thead>
-            <tbody>
-                {''.join(perf_rows)}
-            </tbody>
-        </table>
-        </div>
-        """
-        
-        st.markdown(perf_table_html, unsafe_allow_html=True)
+        # Streamlit 기본 데이터프레임 사용
+        st.dataframe(perf_display, use_container_width=True, hide_index=True)
         
         st.markdown("##### 고성과 달성 가능성 (Top 10%)")
         if len(prob_10) > 0:
@@ -329,95 +270,15 @@ def render():
             prob_display.columns = ["이미지 타입", "Top 10% 달성 확률"]
             prob_display["Top 10% 달성 확률"] = prob_display["Top 10% 달성 확률"].apply(lambda x: f"{x*100:.1f}%")
             
-            # HTML 테이블로 렌더링
-            prob_rows = []
-            for idx, row in prob_display.iterrows():
-                bg_color = "#FFFFFF" if idx % 2 == 0 else "#FAFBFC"
-                border_top = "border-top: 1px solid #E5E7EB;" if idx == 0 else ""
-                prob_rows.append(f"""
-                <tr style="background-color: {bg_color};">
-                    <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; font-weight: 500; color: #111827; {border_top}">{row['이미지 타입']}</td>
-                    <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; color: #1F5795; font-weight: 500; {border_top}">{row['Top 10% 달성 확률']}</td>
-                </tr>
-                """)
-            
-            prob_table_html = f"""
-            <div style="
-                background-color: #FFFFFF;
-                border: 1px solid #E5E7EB;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-                margin-bottom: 24px;
-            ">
-            <table style="
-                width: 100%;
-                border-collapse: collapse;
-                margin: 0;
-                font-size: 13px;
-                font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;
-            ">
-                <thead>
-                    <tr style="background: linear-gradient(to bottom, #F9FAFB 0%, #F3F4F6 100%);">
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">이미지 타입</th>
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">Top 10% 달성 확률</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {''.join(prob_rows)}
-                </tbody>
-            </table>
-            </div>
-            """
-            
-            st.markdown(prob_table_html, unsafe_allow_html=True)
+            # Streamlit 기본 데이터프레임 사용
+            st.dataframe(prob_display, use_container_width=True, hide_index=True)
         
         if len(conc_10) > 0:
             conc_display = conc_10.copy()
             conc_display.columns = ["이미지 타입", "Top 10% 내 비율"]
             conc_display["Top 10% 내 비율"] = conc_display["Top 10% 내 비율"].apply(lambda x: f"{x*100:.1f}%")
             
-            # HTML 테이블로 렌더링
-            conc_rows = []
-            for idx, row in conc_display.iterrows():
-                bg_color = "#FFFFFF" if idx % 2 == 0 else "#FAFBFC"
-                border_top = "border-top: 1px solid #E5E7EB;" if idx == 0 else ""
-                conc_rows.append(f"""
-                <tr style="background-color: {bg_color};">
-                    <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; font-weight: 500; color: #111827; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important; {border_top}">{row['이미지 타입']}</td>
-                    <td style="padding: 12px 16px; text-align: center; border-bottom: 1px solid #E5E7EB; color: #1F5795; font-weight: 500; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important; {border_top}">{row['Top 10% 내 비율']}</td>
-                </tr>
-                """)
-            
-            conc_table_html = f"""
-            <div style="
-                background-color: #FFFFFF;
-                border: 1px solid #E5E7EB;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-                margin-bottom: 24px;
-            ">
-            <table style="
-                width: 100%;
-                border-collapse: collapse;
-                margin: 0;
-                font-size: 13px;
-                font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;
-            ">
-                <thead>
-                    <tr style="background: linear-gradient(to bottom, #F9FAFB 0%, #F3F4F6 100%);">
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">이미지 타입</th>
-                        <th style="padding: 14px 16px; text-align: center; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151; font-size: 12px; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">Top 10% 내 비율</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {''.join(conc_rows)}
-                </tbody>
-            </table>
-            </div>
-            """
-            
-            st.markdown(conc_table_html, unsafe_allow_html=True)
+            # Streamlit 기본 데이터프레임 사용
+            st.dataframe(conc_display, use_container_width=True, hide_index=True)
         
         st.caption(f"💡 Top 10% 기준선: 참여율 {threshold_10:.6f} 이상")
