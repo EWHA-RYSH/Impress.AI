@@ -198,7 +198,7 @@ def render():
         col1, col2 = st.columns(2)
         with col1:
             if len(perf_summary) > 0:
-                # 평균과 중앙값 모두 막대로 표시 (댓글 수 차트와 동일)
+                # 평균과 중앙값 모두 막대로 표시 
                 fig1 = px.bar(
                     perf_summary,
                     x="img_type",
@@ -558,15 +558,141 @@ def render():
             """,
             unsafe_allow_html=True
         )
-        section_gap(24)
-
-         #안정성 인사이트 표시
-        stability_bullets = country_insight.get("stability_analysis", {}).get("bullets", [])
-
-        if stability_bullets:
-            section_gap(32)
-            render_insight_bullets(
-                stability_bullets)
+        
+        # 안정성 인사이트 표시 (헤더 하이라이트 형태)
+        country_insight = insights.get(selected_country, {})
+        stability_data = country_insight.get("stability_analysis", {})
+        
+        if stability_data and stability_data.get("type"):
+            stability_type = stability_data.get("type")
+            keyword = stability_data.get("keyword", "")
+            interpretation = stability_data.get("interpretation", {})
+            
+            # 키워드가 있으면 텍스트에서 키워드 부분을 강조
+            if keyword and keyword in stability_type:
+                # 키워드 부분을 볼드 + 색상 변경으로 강조 ('유형' 부분)
+                highlighted_type = stability_type.replace(
+                    keyword, 
+                    f'<span class="stability-keyword" style="font-weight: 700 !important; color: {BRAND_COLORS["primary"]} !important; font-family: \'Arita-Dotum-Bold\', \'Arita-Dotum-Medium\', \'Arita-dotum-Medium\', sans-serif !important;">{keyword}</span>'
+                )
+            else:
+                highlighted_type = stability_type
+            
+            # 요약을 Insight Callout 형태로 표시
+            st.markdown(
+                f"""
+                <style>
+                .stability-keyword {{
+                    font-weight: 700 !important;
+                    color: {BRAND_COLORS['primary']} !important;
+                    font-family: 'Arita-Dotum-Bold', 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;
+                }}
+                </style>
+                <div style="margin-top: {SPACING['lg']}; margin-bottom: {SPACING['md']};">
+                    <div style="background-color: rgba(31, 87, 149, 0.06); border-radius: {BORDER_RADIUS['sm']}; padding: {SPACING['lg']} {SPACING['xl']}; border: none; box-shadow: none; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">
+                        <div style="display: flex; align-items: flex-start; gap: {SPACING['sm']};">
+                            <div style="color: {BRAND_COLORS['primary']}; font-size: 16px; line-height: 1.4; flex-shrink: 0; margin-top: 2px;">📌</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 11px; font-weight: 700; color: {BRAND_COLORS['primary']}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: {SPACING['xs']}; font-family: 'Arita-Dotum-Bold', 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">
+                                    INSIGHT
+                                </div>
+                                <div style="font-size: {FONT_SIZES['xl']}; font-weight: 500; color: {TEXT_COLORS['primary']}; line-height: 1.5; word-break: keep-all; font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;">
+                                    {highlighted_type}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            
+            # 해석 토글 (디스클로저 라인 형태 - 카드 배경 없이)
+            if interpretation and interpretation.get("bullets"):
+                interpretation_title = interpretation.get("title", "성과 안정성 구조 및 지표 해석")
+                interpretation_bullets = interpretation.get("bullets", [])
+                
+                # 디스클로저 라인 형태의 토글 (HTML details/summary 직접 사용)
+                bullets_html = ""
+                for bullet in interpretation_bullets:
+                    bullets_html += f'<div style="margin-bottom: {SPACING["sm"]}; {get_text_style("md", "secondary", "normal", "medium")} line-height: 1.6;">{bullet}</div>'
+                
+                st.markdown(
+                    f"""
+                    <div class="stability-interpretation-wrapper" style="border-top: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB; padding: 12px 0; margin: 16px 0;">
+                        <details class="stability-details" style="cursor: pointer;">
+                            <summary class="stability-interpretation-summary">
+                                {interpretation_title}
+                            </summary>
+                            <div class="stability-interpretation-content" style="margin-top: 16px; padding-left: 0;">
+                                {bullets_html}
+                            </div>
+                        </details>
+                    </div>
+                    <style>
+                    .stability-interpretation-wrapper {{
+                        font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;
+                    }}
+                    .stability-details {{
+                        background: transparent !important;
+                        border: none !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                    }}
+                    .stability-interpretation-summary {{
+                        font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;
+                        font-size: 14px !important;
+                        font-weight: 500 !important;
+                        color: #6B7280 !important;
+                        list-style: none !important;
+                        padding: 0 !important;
+                        padding-left: 20px !important;
+                        margin: 0 !important;
+                        cursor: pointer !important;
+                        user-select: none !important;
+                        position: relative !important;
+                        display: block !important;
+                    }}
+                    .stability-interpretation-summary::-webkit-details-marker {{
+                        display: none !important;
+                    }}
+                    .stability-interpretation-summary::marker {{
+                        display: none !important;
+                        content: '' !important;
+                    }}
+                    .stability-interpretation-summary::before {{
+                        content: '+' !important;
+                        position: absolute !important;
+                        left: 0 !important;
+                        top: 0 !important;
+                        color: {BRAND_COLORS['primary']} !important;
+                        font-weight: 600 !important;
+                        font-size: 16px !important;
+                        width: 16px !important;
+                        text-align: center !important;
+                        line-height: 1.4 !important;
+                        font-family: 'Arita-Dotum-Bold', 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;
+                    }}
+                    .stability-details[open] .stability-interpretation-summary::before {{
+                        content: '−' !important;
+                    }}
+                    .stability-interpretation-summary:hover {{
+                        color: {BRAND_COLORS['primary']} !important;
+                    }}
+                    .stability-interpretation-content {{
+                        font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;
+                        color: #374151 !important;
+                    }}
+                    .stability-interpretation-content div {{
+                        font-family: 'Arita-Dotum-Medium', 'Arita-dotum-Medium', sans-serif !important;
+                        color: #374151 !important;
+                    }}
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
+            
+            section_gap(24)
 
         #그래프 표시    
         if len(stability) > 0:
@@ -605,9 +731,10 @@ def render():
                     showlegend=False, 
                     height=300,
                     yaxis=dict(title=None),
-                    margin=dict(l=40, r=20, t=20, b=40),
+                    margin=dict(l=40, r=10, t=20, b=40),
                     title=dict(text=""),
-                    xaxis=dict(title=None)
+                    xaxis=dict(title=None),
+                    autosize=True
                 )
                 st.plotly_chart(fig1, use_container_width=True, config={"displayModeBar": False})
             
@@ -644,9 +771,10 @@ def render():
                     showlegend=False, 
                     height=300,
                     yaxis=dict(title=None),
-                    margin=dict(l=40, r=20, t=20, b=40),
+                    margin=dict(l=40, r=10, t=20, b=40),
                     title=dict(text=""),
-                    xaxis=dict(title=None)
+                    xaxis=dict(title=None),
+                    autosize=True
                 )
                 st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
             
@@ -683,14 +811,12 @@ def render():
                     showlegend=False, 
                     height=300,
                     yaxis=dict(title=None),
-                    margin=dict(l=40, r=20, t=20, b=40),
+                    margin=dict(l=40, r=10, t=20, b=40),
                     title=dict(text=""),
-                    xaxis=dict(title=None)
+                    xaxis=dict(title=None),
+                    autosize=True
                 )
                 st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar": False})
-        
-                country_insight = insights.get(selected_country, {})
-
 
         # 상세 통계 보기
         with st.expander("상세 통계 보기", expanded=False):

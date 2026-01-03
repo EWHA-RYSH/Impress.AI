@@ -230,6 +230,7 @@ def inject_style():
             max-width: 100% !important;
             min-height: 300px !important;
             box-sizing: border-box !important;
+            overflow: hidden !important;
         }}
         
         .stPlotlyChart > div {{
@@ -237,6 +238,7 @@ def inject_style():
             max-width: 100% !important;
             min-height: 300px !important;
             box-sizing: border-box !important;
+            overflow: hidden !important;
         }}
         
         .stPlotlyChart > div > div {{
@@ -244,9 +246,10 @@ def inject_style():
             max-width: 100% !important;
             min-height: 300px !important;
             box-sizing: border-box !important;
+            overflow: hidden !important;
         }}
         
-        /* Plotly 차트 내부 요소는 overflow 제한하지 않음 */
+        /* Plotly 차트 내부 요소 */
         .stPlotlyChart iframe,
         .stPlotlyChart svg,
         .stPlotlyChart .js-plotly-plot {{
@@ -255,6 +258,7 @@ def inject_style():
             min-height: 300px !important;
             display: block !important;
             box-sizing: border-box !important;
+            overflow: hidden !important;
         }}
         
         /* Plotly 차트가 숨겨지지 않도록 보장 */
@@ -265,6 +269,16 @@ def inject_style():
             width: 100% !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }}
+        
+        div[data-testid="stPlotlyChart"] > div {{
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
         }}
         
         div[data-testid="stPlotlyChart"] iframe,
@@ -275,6 +289,7 @@ def inject_style():
             width: 100% !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
+            overflow: hidden !important;
         }}
         
         div.stDataFrame {{
@@ -353,18 +368,59 @@ def inject_style():
         }}
         
         [data-testid="column"] {{
+            width: 100% !important;
             max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            margin: 0 !important;
         }}
         
         [data-testid="column"] > div {{
-            max-width: 100% !important;
             width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            margin: 0 !important;
         }}
         
-        /* Plotly 차트가 있는 컬럼은 overflow 제한하지 않음 */
+        /* Plotly 차트가 있는 컬럼은 차트가 컨테이너를 벗어나지 않도록 */
         [data-testid="column"] .stPlotlyChart,
+        [data-testid="column"] .stPlotlyChart > div,
+        [data-testid="column"] .stPlotlyChart > div > div,
         [data-testid="column"] .js-plotly-plot {{
-            overflow: visible !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+        }}
+        
+        [data-testid="column"] .stPlotlyChart iframe,
+        [data-testid="column"] .stPlotlyChart svg,
+        [data-testid="column"] .js-plotly-plot svg,
+        [data-testid="column"] .js-plotly-plot iframe {{
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+        }}
+        
+        /* 차트 컨테이너 추가 제약 */
+        [data-testid="column"] div[data-testid="stPlotlyChart"] {{
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }}
+        
+        [data-testid="column"] div[data-testid="stPlotlyChart"] > div {{
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
         }}
         
         .stMarkdown p, .stMarkdown div {{
@@ -378,7 +434,33 @@ def inject_style():
         
         .main .block-container {{
             max-width: 100% !important;
+            width: 100% !important;
             overflow-x: hidden !important;
+            box-sizing: border-box !important;
+        }}
+        
+        /* Plotly 차트가 메인 컨테이너를 벗어나지 않도록 */
+        .main .block-container .stPlotlyChart,
+        .main .block-container div[data-testid="stPlotlyChart"] {{
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+        }}
+        
+        /* 컬럼 그리드 제약 강화 */
+        .stColumns {{
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+        }}
+        
+        .stColumns > div {{
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
         }}
         
         [data-testid="stSidebar"] {{

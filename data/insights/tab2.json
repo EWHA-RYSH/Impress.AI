@@ -15,9 +15,15 @@
       ]
     },
     "stability_analysis": {
-      "bullets": [
-      "📍 <b>성과 예측 가능성이 매우 높은 안정형</b>"
-      ]
+      "type": "성과 예측 가능성이 매우 높은 안정형",
+      "keyword": "안정형",
+      "interpretation": {
+        "title": "안정성 지표 해석",
+        "bullets": [
+          "• 표준편차(STD)와 IQR이 낮은 수준",
+          "• 변동계수(CV) 역시 전반적으로 낮아, 상대적 변동성도 작음"
+        ]
+      }
     }
   },
   "ID": {
@@ -36,9 +42,15 @@
       ]
     },
     "stability_analysis": {
-      "bullets": [
-      "📍 <b>성과 변동 폭이 큰 고변동형</b>"
-      ]
+      "type": "성과 변동 폭이 큰 고변동형",
+      "keyword": "고변동형",
+      "interpretation": {
+        "title": "성과 안정성 구조 및 지표 해석",
+        "bullets": [
+          "• STD·IQR이 모두 높게 형성",
+          "• CV 역시 커, 평균 대비 변동성이 큰 구조"
+        ]
+      }
     }    
   },
   "MY": {
@@ -57,9 +69,15 @@
       ]
     },
     "stability_analysis": {
-      "bullets": [
-      "📍 <b>중간 성과의 일관성이 유지되는 준안정형</b>"
-      ]
+      "type": "중간 성과의 일관성이 유지되는 준안정형",
+      "keyword": "준안정형",
+      "interpretation": {
+        "title": "성과 안정성 구조 및 지표 해석",
+        "bullets": [
+          "• IQR이 상대적으로 좁음",
+          "• CV는 중간 수준으로 유지"
+        ]
+      }
     } 
   },
   "TH": {
@@ -78,9 +96,15 @@
       ]
     },
     "stability_analysis": {
-      "bullets": [
-      "📍 <b>성과 편차가 극단적으로 나타나는 고리스크형</b>"
-      ]
+      "type": "성과 편차가 극단적으로 나타나는 고리스크형",
+      "keyword": "고리스크형",
+      "interpretation": {
+        "title": "성과 안정성 구조 및 지표 해석",
+        "bullets": [
+          "• STD와 CV가 매우 높게 나타남",
+          "• IQR 또한 넓어 중간 성과의 일관성이 낮음"
+        ]
+      }
     } 
   },
   "VN": {
@@ -99,9 +123,15 @@
       ]
     },
     "stability_analysis": {
-      "bullets": [
-      "📍 <b>이미지 타입 선택에 따라 안정성이 달라지는 선택의존형</b>"
-      ]
+      "type": "이미지 타입 선택에 따라 안정성이 달라지는 선택의존형",
+      "keyword": "선택의존형",
+      "interpretation": {
+        "title": "성과 안정성 구조 및 지표 해석",
+        "bullets": [
+          "• 전체 CV는 중간 수준",
+          "• 타입별로 STD·IQR 편차가 큼"
+        ]
+      }
     } 
   },
   "PH": {
@@ -120,9 +150,15 @@
       ]
     },
     "stability_analysis": {
-      "bullets": [
-      "📍 <b>소수 콘텐츠가 변동성을 주도하는 히트의존형</b>"
-      ]
+      "type": "소수 콘텐츠가 변동성을 주도하는 히트의존형",
+      "keyword": "히트의존형",
+      "interpretation": {
+        "title": "성과 안정성 구조 및 지표 해석",
+        "bullets": [
+          "• STD·CV 모두 높게 형성",
+          "• IQR은 상대적으로 좁으나, 상단 아웃라이어 영향이 큼"
+        ]
+      }
     } 
   },
   "JP": {
@@ -141,9 +177,15 @@
       ]
     },
     "stability_analysis": {
-      "bullets": [
-      "📍 <b>기본 성과는 안정적이나 예외 변동이 존재하는 저빈도리스크형</b>"
-      ]
+      "type": "기본 성과는 안정적이나 예외 변동이 존재하는 저빈도 리스크형",
+      "keyword": "저빈도 리스크형",
+      "interpretation": {
+        "title": "성과 안정성 구조 및 지표 해석",
+        "bullets": [
+          "• 좁은 IQR",
+          "• STD는 상단 아웃라이어 영향으로 상대적으로 큼"
+        ]
+      }
     } 
   }
 }
