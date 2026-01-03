@@ -30,6 +30,7 @@ def render():
         return
     
     # 국가별 인사이트 가져오기
+    selected_country = st.session_state.selected_country
     country_insight = insights.get(selected_country, {})
     
     countries = sorted(df_meta["country"].unique())
