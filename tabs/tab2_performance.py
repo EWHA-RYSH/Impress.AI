@@ -282,55 +282,6 @@ def render():
         
         section_gap(48)
         
-        # 댓글 비율 분포
-        st.markdown(
-            """
-            <div class="section">
-                <h4 class="section-title">댓글 비율 분포</h4>
-                <div class="section-desc">이미지 타입별 댓글 비율을 비교합니다.</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        section_gap(16)
-        
-        if len(response_char) > 0:
-            # Top 1만 연한 블루로 강조
-            max_idx = response_char["comment_ratio_mean"].idxmax()
-            colors = []
-            text_values = []
-            for idx, row in response_char.iterrows():
-                if idx == max_idx:
-                    colors.append(LIGHT_BLUE_HIGHLIGHT)  # Top 1만 연한 블루
-                else:
-                    colors.append(DEFAULT_BAR_COLOR)  # 나머지는 #E1E4EA
-                # 값 라벨 추가 (퍼센트)
-                text_values.append(f"{row['comment_ratio_mean']*100:.1f}%")
-            
-            fig4 = px.bar(
-                response_char,
-                x="img_type",
-                y="comment_ratio_mean",
-                labels={"img_type": "이미지 타입", "comment_ratio_mean": ""},
-                title="이미지 타입별 평균 댓글 비율",
-                text=text_values
-            )
-            fig4.update_traces(
-                marker_color=colors, 
-                width=0.6,
-                textposition="outside",
-                textfont=dict(size=11, color="#6B7280", family="Arita-Dotum-Medium, Arita-dotum-Medium, sans-serif")
-            )
-            fig4 = apply_chart_style(fig4)
-            fig4.update_layout(
-                bargap=0.4, 
-                showlegend=False, 
-                height=400,
-                yaxis=dict(title=None),
-                margin=dict(l=40, r=20, t=40, b=40)
-            )
-            st.plotly_chart(fig4, use_container_width=True, config={"displayModeBar": False})
-        
         # 국가별 인사이트 표시
         country_insight = insights.get(selected_country, {})
         performance_bullets = country_insight.get("performance_comparison", {}).get("bullets", [])
@@ -357,19 +308,6 @@ def render():
             if "중앙값 참여율" in perf_display.columns:
                 perf_display["중앙값 참여율"] = perf_display["중앙값 참여율"].apply(lambda x: format_engagement_rate(x))
             st.dataframe(perf_display, use_container_width=True, hide_index=True)
-            
-            if len(response_char) > 0:
-                st.markdown("##### 댓글 비율 통계")
-                response_display = response_char.copy()
-                response_display.columns = [
-                    "이미지 타입",
-                    "개수",
-                    "평균 댓글 비율",
-                    "중앙값 댓글 비율",
-                    "평균 댓글 수",
-                    "평균 좋아요 수"
-                ]
-                st.dataframe(response_display, use_container_width=True, hide_index=True)
     
     # ============================================
     # 탭 2: 고성과 분석
