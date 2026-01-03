@@ -191,7 +191,7 @@ def render_image_type_guide():
         if b64_img:
             img_tag = f'<img src="data:image/jpeg;base64,{b64_img}" alt="Type {type_num}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />'
         else:
-            img_tag = f'<div style="display: flex; align-items: center; justify-content: center; height: 100%; {get_text_style('sm', 'muted')}">이미지 없음</div>'
+            img_tag = f'<div style="display: flex; align-items: center; justify-content: center; height: 100%; {get_text_style("sm", "muted")}">이미지 없음</div>'
         
         cards_html += f'<div class="type-card"><div class="type-card-header"><span class="type-chip">Type {type_num}</span><span class="type-title">{type_name}</span></div><div class="type-image-wrapper">{img_tag}</div><div class="type-description">{type_desc}</div></div>'
     

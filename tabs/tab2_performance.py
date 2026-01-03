@@ -621,7 +621,16 @@ def render():
             unsafe_allow_html=True
         )
         section_gap(24)
-        
+
+         #안정성 인사이트 표시
+        stability_bullets = country_insight.get("stability_analysis", {}).get("bullets", [])
+
+        if stability_bullets:
+            section_gap(32)
+            render_insight_bullets(
+                stability_bullets)
+
+        #그래프 표시    
         if len(stability) > 0:
             col1, col2, col3 = st.columns(3)
             
@@ -742,6 +751,9 @@ def render():
                 )
                 st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar": False})
         
+                country_insight = insights.get(selected_country, {})
+
+
         # 상세 통계 보기
         with st.expander("상세 통계 보기", expanded=False):
             if len(stability) > 0:
